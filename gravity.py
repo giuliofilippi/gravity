@@ -19,6 +19,8 @@ SIZE = 0.04
 COLOR = (0,206,209)
 # WHITE
 WHITE = (255,255,255)
+# BLACK
+BLACK = (0,0,0)
 # LIFETIME
 LIFETIME=360
 # size of screen
@@ -132,6 +134,9 @@ def main():
         for i in range(1,13):
             pos = vector_transform(note_positions[note_index[i]], loc=400, scale=350)
             pygame.draw.circle(screen, color=WHITE, center=pos, radius=15)
+            font = pygame.font.SysFont(None, 24)
+            img = font.render(str(i), True,BLACK)
+            screen.blit(img, pos-np.array([8,8]))
 
         
         # --- Drawing the birds
