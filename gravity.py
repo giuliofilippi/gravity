@@ -17,6 +17,8 @@ SPEED = 0.01
 SIZE = 0.04
 # COLOR
 COLOR = (0,206,209)
+# WHITE
+WHITE = (255,255,255)
 # LIFETIME
 LIFETIME=360
 # size of screen
@@ -32,6 +34,21 @@ Bird(pos=[0,0], dir=[1,0], speed=SPEED, size=SIZE, color=COLOR, mu=mu),
 Bird(pos=[0,0], dir=[0,1], speed=SPEED, size=SIZE, color=COLOR, mu=mu),
 Bird(pos=[0,0], dir=[0,-1], speed=SPEED, size=SIZE, color=COLOR, mu=mu)
 ]
+# color palette
+color_palette = {
+    '1':(69, 66, 235),
+    '2':(250, 2, 2),
+    '3':(69, 66, 235),
+    '4':(250, 2, 2),
+    '5':(69, 66, 235),
+    '6':(250, 2, 2),
+    '7':(69, 66, 235),
+    '8':(250, 2, 2),
+    '9':(69, 66, 235),
+    '10':(250, 2, 2),
+    '11':(69, 66, 235),
+    '12':(250, 2, 2),
+}
 # ----------------------------
 
 
@@ -65,6 +82,7 @@ def main():
             filename = 'animation/'+'capture_'+str(i)+'.jpeg'
             pygame.image.save(screen, filename)
 
+
         # --- Events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -77,26 +95,24 @@ def main():
                     if event.unicode == str(i):
                         pos = note_positions[note_index[i]]
                         dir = note_positions[(note_index[i]+7)%12]-note_positions[note_index[i]]
-                        new_boid = Bird(pos=pos, dir=dir, speed=SPEED, size=SIZE, color=COLOR, mu=mu)
+                        new_boid = Bird(pos=pos, dir=dir, speed=SPEED, size=SIZE, color=color_palette[str(i)], mu=mu)
                         boid_list.append(new_boid)
                 if event.unicode == '0':
                     pos = note_positions[note_index[10]]
                     dir = note_positions[(note_index[10]+7)%12]-note_positions[note_index[10]]
-                    new_boid = Bird(pos=pos, dir=dir, speed=SPEED, size=SIZE, color=COLOR, mu=mu)
+                    new_boid = Bird(pos=pos, dir=dir, speed=SPEED, size=SIZE, color=color_palette['10'], mu=mu)
                     boid_list.append(new_boid)
                 if event.unicode == '-':
                     pos = note_positions[note_index[11]]
                     dir = note_positions[(note_index[11]+7)%12]-note_positions[note_index[11]]
-                    new_boid = Bird(pos=pos, dir=dir, speed=SPEED, size=SIZE, color=COLOR, mu=mu)
+                    new_boid = Bird(pos=pos, dir=dir, speed=SPEED, size=SIZE, color=color_palette['11'], mu=mu)
                     boid_list.append(new_boid)
                 if event.unicode == '=':
                     pos = note_positions[note_index[12]]
                     dir = note_positions[(note_index[12]+7)%12]-note_positions[note_index[12]]
-                    new_boid = Bird(pos=pos, dir=dir, speed=SPEED, size=SIZE, color=COLOR, mu=mu)
+                    new_boid = Bird(pos=pos, dir=dir, speed=SPEED, size=SIZE, color=color_palette['12'], mu=mu)
                     boid_list.append(new_boid)
 
-        # --- Background
-        screen.fill((0,0,0))
 
         # --- Logic
         for boid in boid_list:
@@ -107,7 +123,18 @@ def main():
             # change boid positions and velocities based on rules
             boid.update()
 
-        # --- Drawing
+
+        # --- Background
+        screen.fill((0,0,0))
+
+
+        # --- The Star Pattern
+        for i in range(1,13):
+            pos = vector_transform(note_positions[note_index[i]], loc=400, scale=350)
+            pygame.draw.circle(screen, color=WHITE, center=pos, radius=15)
+
+        
+        # --- Drawing the birds
         for boid in boid_list:
             points = get_triangle_points(boid.pos,boid.direction(),boid.size, loc=[400,400], scale=350)
             pygame.draw.polygon(screen, boid.color, points)
