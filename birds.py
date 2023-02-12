@@ -41,12 +41,12 @@ note_positions = star_positions()
 # dictionnary of indices for notes
 note_index = {i:(i+6)%12 for i in range(1,13)}
 
-def compute_hit_and_new(pos, dir, bird_size):
+def compute_hit(pos, dir, bird_size):
     for i in range(1,13):
         x = note_positions[note_index[i]]
         if np.linalg.norm(pos+bird_size*dir-x)<=15/350:
-            return i,(i+6)%12+1
-    return -1,-1
+            return i
+    return -1
 
 
 # Class to generate Birds
@@ -61,7 +61,7 @@ class Bird:
         self.field = field
         self.time = 0
         self.hitnote = -1
-        self.outnote = -1
+        self.note = -1
 
     # Direction from velocity
     def direction(self):
@@ -119,7 +119,7 @@ class Bird:
     def hit_update(self):
         R = np.linalg.norm(self.pos)
         if R>=1-15/350 and self.time>10:
-            self.hitnote, self.outnote = compute_hit_and_new(self.pos,self.direction(),self.size)
+            self.hitnote = compute_hit(self.pos,self.direction(),self.size)
             if self.hitnote!=-1:
                 self.time = 360
         return self

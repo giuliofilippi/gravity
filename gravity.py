@@ -53,9 +53,10 @@ def main():
                         pos = note_positions[note_index[i]]
                         dir = note_positions[(note_index[i]+7)%12]-note_positions[note_index[i]]
                         new_boid = Bird(pos=pos, dir=dir, **params)
+                        new_boid.note = 60+i-1
                         boid_list.append(new_boid)
                         # music
-                        note_on = [0x90, 60+i-1, 112]
+                        note_on = [0x90, new_boid.note, 112]
                         midiout.send_message(note_on)
 
                 if event.unicode == '0':
@@ -63,24 +64,27 @@ def main():
                     dir = note_positions[(note_index[10]+7)%12]-note_positions[note_index[10]]
                     new_boid = Bird(pos=pos, dir=dir, **params)
                     boid_list.append(new_boid)
+                    new_boid.note = 70
                     # music
-                    note_on = [0x90, 70, 112]
+                    note_on = [0x90, new_boid.note, 112]
                     midiout.send_message(note_on)
                 if event.unicode == '-':
                     pos = note_positions[note_index[11]]
                     dir = note_positions[(note_index[11]+7)%12]-note_positions[note_index[11]]
                     new_boid = Bird(pos=pos, dir=dir, **params)
                     boid_list.append(new_boid)
+                    new_boid.note = 71
                     # music
-                    note_on = [0x90, 71, 112]
+                    note_on = [0x90, new_boid.note, 112]
                     midiout.send_message(note_on)
                 if event.unicode == '=':
                     pos = note_positions[note_index[12]]
                     dir = note_positions[(note_index[12]+7)%12]-note_positions[note_index[12]]
                     new_boid = Bird(pos=pos, dir=dir, **params)
                     boid_list.append(new_boid)
+                    new_boid.note = 72
                     # music
-                    note_on = [0x90, 72, 112]
+                    note_on = [0x90, new_boid.note, 112]
                     midiout.send_message(note_on)
                 if event.unicode == ' ':
                     boid_list = []
@@ -97,16 +101,20 @@ def main():
             # remove older boids
             if boid.time > LIFETIME:
                 boid_list.remove(boid)
+                # music
+                note_off = [0x90, boid.note, 0]
+                midiout.send_message(note_off)
 
             # new boids
-            if boid.outnote != -1:
-                pos = note_positions[note_index[boid.outnote]]
-                dir = note_positions[(note_index[boid.outnote]+7)%12]-pos
+            if boid.hitnote != -1:
+                pos = note_positions[note_index[boid.hitnote]]
+                dir = note_positions[(note_index[boid.hitnote]+7)%12]-pos
                 new_boid = Bird(pos=pos, dir=dir, **params)
                 boid_list.append(new_boid)
+                new_boid.note = 60 + boid.hitnote - 1
                 note_colors[boid.hitnote]=(0,255,0)
                 # music
-                note_on = [0x90, 60+boid.outnote-1, 112]
+                note_on = [0x90, new_boid.note, 112]
                 midiout.send_message(note_on)
 
         # --- Drawing the Background
