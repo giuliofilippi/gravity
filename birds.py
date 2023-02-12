@@ -40,12 +40,13 @@ def get_triangle_points(pos, direction, size, loc, scale):
 # Class to generate Birds
 class Bird:
     # Initialise Object
-    def __init__(self, pos, dir, speed, size, color, mu):
+    def __init__(self, pos, dir, speed, size, color, field):
         self.pos = np.array(pos)
+        self.speed = speed
         self.velocity = speed * normalize(np.array(dir))
         self.size = size
         self.color = color
-        self.mu = mu
+        self.field = field
         self.time = 0
 
     # Direction from velocity
@@ -54,22 +55,78 @@ class Bird:
         vel = np.linalg.norm(vec)
         return vec/vel
 
-    # Change in velocity from gravity effect
+    # Neighbours of a boid
+    def neighbours(self, list_of_boids):
+        neighbours = []
+        for brd in list_of_boids:
+            if distance(self,brd)<self.field and brd!=self:
+                neighbours.append(brd)
+        return neighbours
+
+    # Cohesion: we change a boids velocity based on neighbouring boids center of mass
+    def cohesion_update(self, neighbours, gamma=0.01):
+        N = len(neighbours)
+        if N==0:
+            com = self.pos
+        else:
+            com = sum([x.pos for x in neighbours])/N
+        delta_v = (com - self.pos)*gamma
+        self.velocity += delta_v
+        return self
+
+    # Separation : nearby boids repel each other
+    def separation_update(self, neighbours, gamma=0.05):
+        delta_v = np.array([0,0])
+        for bird in neighbours:
+            if distance(self,bird)<2*self.size:
+                delta_v = delta_v + (self.pos - bird.pos)*gamma
+        self.velocity += delta_v
+        return self
+        
+    # Gravity : boids gravitational attraction
     def gravitational_update(self):
         R = np.linalg.norm(self.pos)
         force_dir = -normalize(self.pos)
         if R>0:
-            self.velocity += (self.mu*force_dir/R**2)
+            # we add a term to make sure gravity does not apply inside the 0.5 circle
+            self.velocity += 0.001*(force_dir/R**2)*max(R-0.1,0)**2
         else:
             pass
         return self
+
+    # Deceleration : boids need to slow down
+    def deceleration_update(self):
+        current_speed = np.linalg.norm(self.velocity)
+        if current_speed>self.speed:
+            self.velocity -= (self.velocity/current_speed)*(current_speed-self.speed)/10
+
+    # Deceleration : boids need to slow down
+    def acceleration_update(self):
+        current_speed = np.linalg.norm(self.velocity)
+        if current_speed<self.speed:
+            self.velocity += (self.velocity/current_speed)*(self.speed-current_speed)/10
         
-    # Final update changin all parameters
-    def update(self):
-        # Gravitational velocity update
+    # Final update changing all parameters
+    def update(self, list_of_boids):
+        # Find neighbours of boid
+        neighbours = self.neighbours(list_of_boids)
+
+        # Gravitational Update
         self.gravitational_update()
 
-        # Update positions
+        # Cohesion Update
+        self.cohesion_update(neighbours)
+
+        # Separation Update
+        self.separation_update(neighbours)
+
+        # Deceleration Update
+        self.deceleration_update()
+
+        # Acceleration Update
+        self.acceleration_update()
+
+        # Position Updates
         self.pos = self.pos + self.velocity
 
         # Time update
