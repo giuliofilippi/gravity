@@ -1,6 +1,7 @@
 # Imports
 import numpy as np
 
+
 # Positions of the 12 notes
 def star_positions():
     notes = [1,2,3,4,5,6,7,8,9,10,11,12]
@@ -35,9 +36,17 @@ def get_triangle_points(pos, direction, size, loc, scale):
     x3 = (pos + normal * size/4)*scale+loc
     return [x1,x2,x3]
 
-def compute_hit_and_new(pos):
-    angle = np.angle(pos[0]+pos[1]j)
+# Star positions
+note_positions = star_positions()
+# dictionnary of indices for notes
+note_index = {i:(i+6)%12 for i in range(1,13)}
 
+def compute_hit_and_new(pos, dir, bird_size):
+    for i in range(1,13):
+        x = note_positions[note_index[i]]
+        if np.linalg.norm(pos+bird_size*dir-x)<=15/350:
+            return i,(i+6)%12+1
+    return -1,-1
 
 
 # Class to generate Birds
@@ -103,9 +112,16 @@ class Bird:
 
     def bound_update(self):
         R = np.linalg.norm(self.pos)
-        if R>0.96 and self.time>20:
+        if R>=1 and self.time>20:
             self.time = 360
-            self.hitnote, self.outnote = compute_hit_and_new(self.pos)
+        return self
+
+    def hit_update(self):
+        R = np.linalg.norm(self.pos)
+        if R>=1-15/350 and self.time>10:
+            self.hitnote, self.outnote = compute_hit_and_new(self.pos,self.direction(),self.size)
+            if self.hitnote!=-1:
+                self.time = 360
         return self
         
     # Final update changing all parameters
@@ -128,6 +144,9 @@ class Bird:
 
         # Position Updates
         self.pos = self.pos + self.velocity
+
+        # Hit Update
+        self.hit_update()
 
         # Out of bounds Update
         self.bound_update()
