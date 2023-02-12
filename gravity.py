@@ -21,6 +21,8 @@ def main():
     clock = pygame.time.Clock()
     # Boid list
     boid_list = []
+    # color of note circles
+    note_colors = note_palette.copy()
 
     # -------- Main Program Loop -----------
     i = 0
@@ -63,28 +65,40 @@ def main():
 
         # --- Logic
         for boid in boid_list:
+            # Update boid parameters
+            boid.update(boid_list)
+
             # remove older boids
             if boid.time > LIFETIME:
                 boid_list.remove(boid)
 
-            # change boid positions and velocities based on rules
-            boid.update(boid_list)
+            # new boids
+            if boid.outnote != -1:
+                pos = note_positions[note_index[boid.outnote]]
+                dir = note_positions[(note_index[boid.outnote]+7)%12]-pos
+                new_boid = Bird(pos=pos, dir=dir, **params)
+                boid_list.append(new_boid)
+                note_colors[boid.hitnote]=(0,255,0)
 
         # --- Background
         screen.fill((0,0,0))
 
-        # --- The Star Pattern
+        # --- Drawing the Star Pattern
         for i in range(1,13):
             pos = vector_transform(note_positions[note_index[i]], loc=400, scale=350)
-            pygame.draw.circle(screen, color=WHITE, center=pos, radius=15)
+            pygame.draw.circle(screen, color=note_colors[i], center=pos, radius=15)
             font = pygame.font.SysFont(None, 24)
             img = font.render(str(i), True,BLACK)
             screen.blit(img, pos-np.array([8,8]))
+            
         
         # --- Drawing the birds
         for boid in boid_list:
             points = get_triangle_points(boid.pos,boid.direction(),boid.size, loc=[400,400], scale=350)
             pygame.draw.polygon(screen, boid.color, points)
+
+        # --- Reset some params
+        note_colors = note_palette.copy()
 
         # --- Wrap-up (Limit to 60 frames per second)
         clock.tick(30)

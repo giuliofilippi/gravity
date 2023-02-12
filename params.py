@@ -16,10 +16,12 @@ COLOR = (0,206,209)
 WHITE = (255,255,255)
 # BLACK
 BLACK = (0,0,0)
+# RED
+RED = (255, 0, 0)
 # LIFETIME
 LIFETIME=360
 # FIELD
-FIELD = 0.3
+FIELD = 1
 # size of screen
 screen_size = [800, 800]
 # Star positions
@@ -27,19 +29,19 @@ note_positions = star_positions()
 # dictionnary of indices for notes
 note_index = {i:(i+6)%12 for i in range(1,13)}
 # color palette
-color_palette = {
-    '1':(69, 66, 235),
-    '2':(250, 2, 2),
-    '3':(69, 66, 235),
-    '4':(250, 2, 2),
-    '5':(69, 66, 235),
-    '6':(250, 2, 2),
-    '7':(69, 66, 235),
-    '8':(250, 2, 2),
-    '9':(69, 66, 235),
-    '10':(250, 2, 2),
-    '11':(69, 66, 235),
-    '12':(250, 2, 2),
+note_palette = {
+    1:WHITE,
+    2:WHITE,
+    3:WHITE,
+    4:WHITE,
+    5:WHITE,
+    6:WHITE,
+    7:WHITE,
+    8:WHITE,
+    9:WHITE,
+    10:WHITE,
+    11:WHITE,
+    12:WHITE,
 }
 # ----------------------------
 

@@ -35,6 +35,9 @@ def get_triangle_points(pos, direction, size, loc, scale):
     x3 = (pos + normal * size/4)*scale+loc
     return [x1,x2,x3]
 
+def compute_hit_and_new(pos):
+    angle = np.angle(pos[0]+pos[1]j)
+
 
 
 # Class to generate Birds
@@ -48,6 +51,8 @@ class Bird:
         self.color = color
         self.field = field
         self.time = 0
+        self.hitnote = -1
+        self.outnote = -1
 
     # Direction from velocity
     def direction(self):
@@ -64,55 +69,53 @@ class Bird:
         return neighbours
 
     # Cohesion: we change a boids velocity based on neighbouring boids center of mass
-    def cohesion_update(self, neighbours, gamma=0.01):
+    def cohesion_update(self, neighbours, gamma=0.0004):
         N = len(neighbours)
         if N==0:
             com = self.pos
         else:
             com = sum([x.pos for x in neighbours])/N
-        delta_v = (com - self.pos)*gamma
+        delta_v = normalize(com - self.pos)*gamma
         self.velocity += delta_v
         return self
 
     # Separation : nearby boids repel each other
-    def separation_update(self, neighbours, gamma=0.05):
+    def separation_update(self, neighbours, gamma=0.0001):
         delta_v = np.array([0,0])
         for bird in neighbours:
             if distance(self,bird)<2*self.size:
-                delta_v = delta_v + (self.pos - bird.pos)*gamma
+                delta_v = delta_v + normalize(self.pos - bird.pos)*gamma
         self.velocity += delta_v
         return self
         
-    # Gravity : boids gravitational attraction
-    def gravitational_update(self):
-        R = np.linalg.norm(self.pos)
-        force_dir = -normalize(self.pos)
-        if R>0:
-            # we add a term to make sure gravity does not apply inside the 0.5 circle
-            self.velocity += 0.001*(force_dir/R**2)*max(R-0.1,0)**2
-        else:
-            pass
+    # Gravity : boids gravitational attraction to origin
+    def gravitational_update(self, gamma=0.00013):
+        origin = np.array([0,0])
+        delta_v = normalize(origin - self.pos)*gamma
+        self.velocity += delta_v
         return self
 
-    # Deceleration : boids need to slow down
-    def deceleration_update(self):
-        current_speed = np.linalg.norm(self.velocity)
-        if current_speed>self.speed:
-            self.velocity -= (self.velocity/current_speed)*(current_speed-self.speed)/10
-
-    # Deceleration : boids need to slow down
+    # Acceleration / Deceleration
     def acceleration_update(self):
         current_speed = np.linalg.norm(self.velocity)
-        if current_speed<self.speed:
-            self.velocity += (self.velocity/current_speed)*(self.speed-current_speed)/10
+        self.velocity += (self.velocity/current_speed)*(self.speed - current_speed)/10
+        return self
+
+    def bound_update(self):
+        R = np.linalg.norm(self.pos)
+        if R>0.96 and self.time>20:
+            self.time = 360
+            self.hitnote, self.outnote = compute_hit_and_new(self.pos)
+        return self
         
     # Final update changing all parameters
     def update(self, list_of_boids):
+
         # Find neighbours of boid
         neighbours = self.neighbours(list_of_boids)
 
         # Gravitational Update
-        self.gravitational_update()
+        #self.gravitational_update()
 
         # Cohesion Update
         self.cohesion_update(neighbours)
@@ -120,14 +123,14 @@ class Bird:
         # Separation Update
         self.separation_update(neighbours)
 
-        # Deceleration Update
-        self.deceleration_update()
-
-        # Acceleration Update
+        # Acceleration Updates
         self.acceleration_update()
 
         # Position Updates
         self.pos = self.pos + self.velocity
+
+        # Out of bounds Update
+        self.bound_update()
 
         # Time update
         self.time += 1
