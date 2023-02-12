@@ -22,4 +22,4 @@ def make_mp4(folder='animation'):
     clips = [mpy.ImageClip(m).set_duration(0.1) for m in file_list]
 
     concat_clip = mpy.concatenate_videoclips(clips, method="compose")
-    concat_clip.write_videofile("boids.mp4", fps=24)
+    concat_clip.write_videofile("birds.mp4", fps=24)

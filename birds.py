@@ -21,7 +21,7 @@ def normalize(v):
 def vector_transform(x, loc, scale):
     return np.array(x)*scale + loc
 
-# distance between boids
+# distance between birds
 def distance(bird1, bird2):
     dx = (bird1.pos-bird2.pos)[0]
     dy = (bird1.pos-bird2.pos)[1]
@@ -69,15 +69,15 @@ class Bird:
         vel = np.linalg.norm(vec)
         return vec/vel
 
-    # Neighbours of a boid
-    def neighbours(self, list_of_boids):
+    # Neighbours of a bird
+    def neighbours(self, list_of_birds):
         neighbours = []
-        for brd in list_of_boids:
+        for brd in list_of_birds:
             if distance(self,brd)<self.field and brd!=self:
                 neighbours.append(brd)
         return neighbours
 
-    # Cohesion: we change a boids velocity based on neighbouring boids center of mass
+    # Cohesion: we change a birds velocity based on neighbouring birds center of mass
     def cohesion_update(self, neighbours, gamma=0.0004):
         N = len(neighbours)
         if N==0:
@@ -88,7 +88,7 @@ class Bird:
         self.velocity += delta_v
         return self
 
-    # Separation : nearby boids repel each other
+    # Separation : nearby birds repel each other
     def separation_update(self, neighbours, gamma=0.0001):
         delta_v = np.array([0,0])
         for bird in neighbours:
@@ -97,7 +97,7 @@ class Bird:
         self.velocity += delta_v
         return self
         
-    # Gravity : boids gravitational attraction to origin
+    # Gravity : birds gravitational attraction to origin
     def gravitational_update(self, gamma=0.00013):
         origin = np.array([0,0])
         delta_v = normalize(origin - self.pos)*gamma
@@ -125,10 +125,10 @@ class Bird:
         return self
         
     # Final update changing all parameters
-    def update(self, list_of_boids):
+    def update(self, list_of_birds):
 
-        # Find neighbours of boid
-        neighbours = self.neighbours(list_of_boids)
+        # Find neighbours of bird
+        neighbours = self.neighbours(list_of_birds)
 
         # Gravitational Update
         #self.gravitational_update()

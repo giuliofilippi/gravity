@@ -6,9 +6,9 @@ from birds import *
 # ---------------------------
 # used to make animation
 MP4 = False
-# speed of boids
+# speed of birds
 SPEED = 0.01
-# Boid size
+# bird size
 SIZE = 0.04
 # COLOR
 COLOR = (0,206,209)

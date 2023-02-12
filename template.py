@@ -8,16 +8,16 @@ import pygame
 # ---------------------------
 # used to make animation
 mp4 = False
-# velocity of boids
+# velocity of birds
 vel = 14
 # field of vision
 field = 75
-# Boid size
-BOID_SIZE = 8
+# bird size
+bird_SIZE = 8
 # size of screen
 screen_size = [800, 800]
-# initial list of boids
-boid_list=[]
+# initial list of birds
+bird_list=[]
 # ----------------------------
 
 
@@ -60,17 +60,17 @@ def main():
         screen.fill((0,0,0))
 
         # --- Logic
-        for boid in boid_list:
-            # remove older boids
-            if boid.time() > 100:
-                boid_list.remove(boid)
+        for bird in bird_list:
+            # remove older birds
+            if bird.time() > 100:
+                bird_list.remove(bird)
 
-            # change boid positions and velocities based on rules
-            boid.update()
+            # change bird positions and velocities based on rules
+            bird.update()
 
         # --- Drawing
-        for boid in boid_list:
-            pygame.draw.polygon(screen, boid.color(), boid.points())
+        for bird in bird_list:
+            pygame.draw.polygon(screen, bird.color(), bird.points())
 
         # --- Wrap-up (Limit to 60 frames per second)
         clock.tick(20)

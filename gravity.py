@@ -26,8 +26,8 @@ def main():
     done = False
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
-    # Boid list
-    boid_list = []
+    # bird list
+    bird_list = []
     # color of note circles
     note_colors = note_palette.copy()
 
@@ -52,69 +52,69 @@ def main():
                     if event.unicode == str(i):
                         pos = note_positions[note_index[i]]
                         dir = note_positions[(note_index[i]+7)%12]-note_positions[note_index[i]]
-                        new_boid = Bird(pos=pos, dir=dir, **params)
-                        new_boid.note = 60+i-1
-                        boid_list.append(new_boid)
+                        new_bird = Bird(pos=pos, dir=dir, **params)
+                        new_bird.note = 60+i-1
+                        bird_list.append(new_bird)
                         # music
-                        note_on = [0x90, new_boid.note, 112]
+                        note_on = [0x90, new_bird.note, 112]
                         midiout.send_message(note_on)
 
                 if event.unicode == '0':
                     pos = note_positions[note_index[10]]
                     dir = note_positions[(note_index[10]+7)%12]-note_positions[note_index[10]]
-                    new_boid = Bird(pos=pos, dir=dir, **params)
-                    boid_list.append(new_boid)
-                    new_boid.note = 70
+                    new_bird = Bird(pos=pos, dir=dir, **params)
+                    bird_list.append(new_bird)
+                    new_bird.note = 70
                     # music
-                    note_on = [0x90, new_boid.note, 112]
+                    note_on = [0x90, new_bird.note, 112]
                     midiout.send_message(note_on)
                 if event.unicode == '-':
                     pos = note_positions[note_index[11]]
                     dir = note_positions[(note_index[11]+7)%12]-note_positions[note_index[11]]
-                    new_boid = Bird(pos=pos, dir=dir, **params)
-                    boid_list.append(new_boid)
-                    new_boid.note = 71
+                    new_bird = Bird(pos=pos, dir=dir, **params)
+                    bird_list.append(new_bird)
+                    new_bird.note = 71
                     # music
-                    note_on = [0x90, new_boid.note, 112]
+                    note_on = [0x90, new_bird.note, 112]
                     midiout.send_message(note_on)
                 if event.unicode == '=':
                     pos = note_positions[note_index[12]]
                     dir = note_positions[(note_index[12]+7)%12]-note_positions[note_index[12]]
-                    new_boid = Bird(pos=pos, dir=dir, **params)
-                    boid_list.append(new_boid)
-                    new_boid.note = 72
+                    new_bird = Bird(pos=pos, dir=dir, **params)
+                    bird_list.append(new_bird)
+                    new_bird.note = 72
                     # music
-                    note_on = [0x90, new_boid.note, 112]
+                    note_on = [0x90, new_bird.note, 112]
                     midiout.send_message(note_on)
                 if event.unicode == ' ':
-                    boid_list = []
+                    bird_list = []
                     for n in range(21,109):
                         note_off = [0x90, n, 0]
                         midiout.send_message(note_off)
 
 
         # --- Logic
-        for boid in boid_list:
-            # Update boid parameters
-            boid.update(boid_list)
+        for bird in bird_list:
+            # Update bird parameters
+            bird.update(bird_list)
 
-            # remove older boids
-            if boid.time > LIFETIME:
-                boid_list.remove(boid)
+            # remove older birds
+            if bird.time > LIFETIME:
+                bird_list.remove(bird)
                 # music
-                note_off = [0x90, boid.note, 0]
+                note_off = [0x90, bird.note, 0]
                 midiout.send_message(note_off)
 
-            # new boids
-            if boid.hitnote != -1:
-                pos = note_positions[note_index[boid.hitnote]]
-                dir = note_positions[(note_index[boid.hitnote]+7)%12]-pos
-                new_boid = Bird(pos=pos, dir=dir, **params)
-                boid_list.append(new_boid)
-                new_boid.note = 60 + boid.hitnote - 1
-                note_colors[boid.hitnote]=(0,255,0)
+            # new birds
+            if bird.hitnote != -1:
+                pos = note_positions[note_index[bird.hitnote]]
+                dir = note_positions[(note_index[bird.hitnote]+7)%12]-pos
+                new_bird = Bird(pos=pos, dir=dir, **params)
+                bird_list.append(new_bird)
+                new_bird.note = 60 + bird.hitnote - 1
+                note_colors[bird.hitnote]=(0,255,0)
                 # music
-                note_on = [0x90, new_boid.note, 112]
+                note_on = [0x90, new_bird.note, 112]
                 midiout.send_message(note_on)
 
         # --- Drawing the Background
@@ -129,9 +129,9 @@ def main():
             screen.blit(img, pos-np.array([8,8]))
             
         # --- Drawing the Birds
-        for boid in boid_list:
-            points = get_triangle_points(boid.pos,boid.direction(),boid.size, loc=[400,400], scale=350)
-            pygame.draw.polygon(screen, boid.color, points)
+        for bird in bird_list:
+            points = get_triangle_points(bird.pos,bird.direction(),bird.size, loc=[400,400], scale=350)
+            pygame.draw.polygon(screen, bird.color, points)
 
         # --- Reset some params
         note_colors = note_palette.copy()
