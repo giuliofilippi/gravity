@@ -1,2 +1,2 @@
 # gravity
-Visualizations.
+Visualizations for SeaBird keyboard.
