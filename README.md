@@ -1,2 +1,2 @@
 # gravity
-Visualizations for SeaBird keyboard.
+Python visualizations for SeaBird midi keyboard.
